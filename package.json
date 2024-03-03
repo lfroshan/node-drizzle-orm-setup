@@ -1,0 +1,44 @@
+{
+  "name": "drizzle-orm-node-minimum-setup",
+  "version": "1.0.0",
+  "description": "This application is the minimum setup for drizzle orm project initiation.",
+  "main": "server.js",
+  "scripts": {
+    "build": "npx tsc",
+    "introspect": "drizzle-kit introspect:pg --config=drizzle.config.ts",
+    "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
+    "migrate": "npx drizzle-kit push:pg",
+    "start:dev": "npm run generate && npm run migrate && nodemon src/server.ts",
+    "start": "node build/src/server.js"
+  },
+  "keywords": [],
+  "author": "Roshan Shrestha",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/pg": "^8.11.2",
+    "@types/typescript": "^2.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/express-session": "^1.18.0",
+    "drizzle-kit": "^0.20.14",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.5.2",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.29.4",
+    "express": "^4.18.3",
+    "express-session": "^1.18.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "postgres": "^3.4.3",
+    "zod": "^3.22.4"
+  }
+}

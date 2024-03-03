@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const validateSchema_middleware_1 = require("../../middleware/validateSchema.middleware");
+const userLogin_domain_1 = require("../../zod.domain/user/userLogin.domain");
+const user_controller_1 = require("../../controller/user/user.controller");
+const userRouter = (0, express_1.Router)();
+userRouter.post('/register', user_controller_1.registerUser);
+userRouter.get('/login', (0, validateSchema_middleware_1.validateSchema)(userLogin_domain_1.UserLoginSchema), user_controller_1.loginUser);
+exports.default = userRouter;
