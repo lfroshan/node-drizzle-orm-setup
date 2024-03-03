@@ -7,7 +7,7 @@ import { ENV_CONFIGS } from './config/envConfigs';
 import studentRouter from './route/user/user.route';
 import { STATUS_CODES } from './constants/statusCodes';
 import { addModifiedDateToRequestData } from './middleware/addModifiedDate';
-import { requestErrorHandler } from './middleware/requestErrorHandler.middleware';
+import requestErrorHandler from './middleware/requestErrorHandler.middleware';
 
 const app = express();
 

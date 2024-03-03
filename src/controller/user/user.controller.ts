@@ -1,5 +1,5 @@
 import { eq, or } from "drizzle-orm";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 import db from '../../db/index';
 import { Exception } from "../../error/Exception";
@@ -23,21 +23,25 @@ import { generateAccessToken, generateRefreshToken, verifyToken } from "../../ut
  * 3. Creates Refresh token.
  * 4. Saves Refresh token.
  */
-export async function registerUser(req: Request, res: Response): Promise<any> {
-  const userPayload: UserRegisterPayload = req.body;
+export async function registerUser(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const userPayload: UserRegisterPayload = req.body;
 
-  if (userPayload.password !== userPayload.confirmPassword)
-    throw new Exception(STATUS_CODES.BAD_REQUEST, VALIDATION_ERRORS.PASSWORD_NOT_MATCHED);
+    if (userPayload.password !== userPayload.confirmPassword)
+      throw new Exception(STATUS_CODES.BAD_REQUEST, VALIDATION_ERRORS.PASSWORD_NOT_MATCHED);
 
-  const userData = await prepareUserData(userPayload);
-  const user = await db.insert(User).values(userData).returning({ id: User.id });
+    const userData = await prepareUserData(userPayload);
+    const user = await db.insert(User).values(userData).returning({ id: User.id });
 
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-  await saveUserTokenInDatabase(req, user, refreshToken);
+    await saveUserTokenInDatabase(req, user, refreshToken);
 
-  Return(res, STATUS_CODES.CREATED, { accessToken, refreshToken });
+    Return(res, STATUS_CODES.CREATED, { accessToken, refreshToken });
+  } catch (err) {
+    next(err);
+  }
 }
 
 /**
@@ -47,27 +51,35 @@ export async function registerUser(req: Request, res: Response): Promise<any> {
  * 2. Creates Refresh token.
  * 3. Saves refresh token.
  */
-export async function loginUser(req: Request, res: Response): Promise<any> {
-  const loginPayload: UserLoginPayload = req.body;
+export async function loginUser(req: Request, res: Response, next: NextFunction): Promise<any> {
 
-  const user = await db.select()
-    .from(User)
-    .where(
-      or(
-        eq(User.email, loginPayload.username),
-        eq(User.username, loginPayload.username)
-      )
-    );
+  try {
+    const loginPayload: UserLoginPayload = req.body;
 
-  if (!(await verifyToken(loginPayload.password, user)))
-    throw new Exception(STATUS_CODES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
+    const user = await db.select()
+      .from(User)
+      .where(
+        or(
+          eq(User.email, loginPayload.username),
+          eq(User.username, loginPayload.username)
+        )
+      );
 
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+    if (!user.at(0)?.id) throw new Exception(STATUS_CODES.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
 
-  await saveUserTokenInDatabase(req, user, refreshToken);
+    if (!(await verifyToken(loginPayload.password, user)))
+      throw new Exception(STATUS_CODES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
 
-  Return(res, STATUS_CODES.OK, { accessToken, refreshToken });
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    await saveUserTokenInDatabase(req, user, refreshToken);
+
+    Return(res, STATUS_CODES.OK, { accessToken, refreshToken });
+  } catch (err) {
+    next(err);
+  }
+
 }
 
 /**
@@ -77,20 +89,41 @@ export async function loginUser(req: Request, res: Response): Promise<any> {
  * 2. Creates Refresh token.
  * 3. Saves refresh token.
  */
-export async function refreshToken(req: Request, res: Response): Promise<any> {
-  const { userId } = req.body.userId;
+export async function refreshToken(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const { userId } = req.body.userId;
 
-  if (!userId) throw new Exception(STATUS_CODES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
+    if (!userId) throw new Exception(STATUS_CODES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
 
-  const user = await db.select().from(UserToken).where(eq(UserToken.userId, userId));
+    const user = await db.select().from(UserToken).where(eq(UserToken.userId, userId));
 
-  if (!user.at(0))
-    throw new Exception(STATUS_CODES.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
+    if (!user.at(0))
+      throw new Exception(STATUS_CODES.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
 
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-  saveUserTokenInDatabase(req, user, refreshToken);
+    saveUserTokenInDatabase(req, user, refreshToken);
 
-  Return(res, STATUS_CODES.OK, { accessToken, refreshToken });
+    Return(res, STATUS_CODES.OK, { accessToken, refreshToken });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function accountExists(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const user = await db.select()
+      .from(User)
+      .where(or
+        (eq(User.email, req.body.email),
+          eq(User.username, req.body.username))
+      );
+
+    if (user.at(0)?.id) throw new Exception(STATUS_CODES.CONFLICT, ERROR_MESSAGES.CONFLICT);
+
+    Return(res, STATUS_CODES.OK, {});
+  } catch (err) {
+    next(err);
+  }
 }

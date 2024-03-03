@@ -9,6 +9,7 @@
     "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
     "migrate": "npx drizzle-kit push:pg",
     "start:dev": "npm run generate && npm run migrate && nodemon src/server.ts",
+    "start:debug": "nodemon src/server.ts",
     "start": "node build/src/server.js"
   },
   "keywords": [],
