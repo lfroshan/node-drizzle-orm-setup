@@ -131,3 +131,7 @@ dist
 
 build
 ./build
+.vscode
+./vscode
+./vscode/*
+*./vscode
