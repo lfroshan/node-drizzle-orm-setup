@@ -14,3 +14,6 @@ Before you begin, make sure you have the following installed on your machine:
 
 1. Clone this repository to your local machine:
 2. Run npm install
+
+## Known bugs:
+1. Swagger API docs is not working.

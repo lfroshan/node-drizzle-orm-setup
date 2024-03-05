@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import express from 'express';
 import session from 'express-session';
 
+import testRouter from './route/test/test.route';
 import { ENV_CONFIGS } from './config/envConfigs';
 import studentRouter from './route/user/user.route';
 import { STATUS_CODES } from './constants/statusCodes';
@@ -37,6 +38,7 @@ app.use("/health", async (req, res) => {
 })
 
 app.use('/api/v1/users', studentRouter);
+app.use('/api/v1/test', testRouter);
 
 // Catch and return any error here!
 app.use(requestErrorHandler);
