@@ -62,7 +62,7 @@ export default class RedisService {
    * @param {object} data - The data to be cached.
    * @param expirationTime - The duration to store cache in redis server.
    */
-  public async setVolatileCache(key: string, data: string, expirationTime: number) {
+  public async setVolatileCache(key: string, data: string, expirationTime: number = ENV_CONFIGS.redisCacheDuration) {
     await this.redisClient?.setEx(key, expirationTime, data);
   }
 

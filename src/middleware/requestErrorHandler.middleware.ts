@@ -1,6 +1,7 @@
 import { ZodError } from "zod";
 
 import { Exception } from "../error/Exception";
+import { JsonWebTokenError } from "jsonwebtoken";
 import { ENV_CONFIGS } from "../config/envConfigs";
 import { STATUS_CODES } from "../constants/statusCodes";
 import { NextFunction, Request, Response } from "express";
@@ -24,6 +25,14 @@ export default function requestErrorHandler(error: any, req: Request, res: Respo
       name: 'Request Validation Error',
       details: error.flatten()
     });
+  }
+
+  if (error instanceof JsonWebTokenError) {
+    return res.status(STATUS_CODES.FORBIDDEN).json({
+      success: 'false',
+      error: error.name,
+      details: 'Illegal Access detected'
+    })
   }
 
   return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({

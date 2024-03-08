@@ -17,7 +17,7 @@ export async function redisCachingTest(req: Request, res: Response, next: NextFu
 
     data = await axios.get(ENV_CONFIGS.testApi);
 
-    await redisInstance.setVolatileCache(req.body.animal, JSON.stringify(data?.data), 30);
+    await redisInstance.setVolatileCache(req.body.animal, JSON.stringify(data?.data));
 
     Return(res, STATUS_CODES.OK, { redisCache: false, data: data?.data });
   } catch (err) {
