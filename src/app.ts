@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import express from 'express';
 import session from 'express-session';
 
+import todoRouter from './route/todo/todo.route';
 import testRouter from './route/test/test.route';
 import { ENV_CONFIGS } from './config/envConfigs';
 import studentRouter from './route/user/user.route';
@@ -38,6 +39,7 @@ app.use("/health", async (req, res) => {
 })
 
 app.use('/api/v1/users', studentRouter);
+app.use('/api/v1/todos', todoRouter);
 app.use('/api/v1/test', testRouter);
 
 // Catch and return any error here!

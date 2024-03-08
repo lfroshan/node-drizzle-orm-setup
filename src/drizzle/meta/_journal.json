@@ -8,6 +8,27 @@
       "when": 1709450898401,
       "tag": "0000_burly_living_tribunal",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1709688816398,
+      "tag": "0001_optimal_rogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1709689638001,
+      "tag": "0002_sour_wolf_cub",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1709773898175,
+      "tag": "0003_stale_jack_power",
+      "breakpoints": true
     }
   ]
 }

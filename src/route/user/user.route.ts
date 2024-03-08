@@ -2,8 +2,8 @@ import { Router } from "express";
 
 import { UserLoginSchema } from "../../zod.domain/user/userLogin.domain";
 import { validateSchema } from "../../middleware/validateSchema.middleware";
-import { validateRefreshToken } from "../../middleware/validateRefreshToken";
 import { UserRegisterSchema } from "../../zod.domain/user/userRegister.domain";
+import { validateRefreshToken } from "../../middleware/validateRefreshToken.middleware";
 import { registerUser, loginUser, refreshToken, accountExists } from "../../controller/user/user.controller";
 
 const userRouter = Router();

@@ -11,8 +11,8 @@ import { VALIDATION_ERRORS } from "../../constants/validationError";
 import { prepareUserData } from "../../service/user/prepareUserData";
 import { UserToken } from "../../db/postgres/schema/userToken.schema";
 import { UserLoginPayload } from "../../zod.domain/user/userLogin.domain";
-import { saveUserTokenInDatabase } from "../../service/user/saveUserToken";
 import { UserRegisterPayload } from "../../zod.domain/user/userRegister.domain";
+import { saveUserTokenInDatabase, updateUserToken } from "../../service/user/saveUserToken";
 import { generateAccessToken, generateRefreshToken, verifyToken } from "../../utils/security/tokenHelper";
 
 /**
@@ -33,8 +33,8 @@ export async function registerUser(req: Request, res: Response, next: NextFuncti
     const userData = await prepareUserData(userPayload);
     const user = await db.insert(User).values(userData).returning({ id: User.id });
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(user.at(0)?.id);
+    const refreshToken = generateRefreshToken(user.at(0)?.id);
 
     await saveUserTokenInDatabase(req, user, refreshToken);
 
@@ -70,10 +70,10 @@ export async function loginUser(req: Request, res: Response, next: NextFunction)
     if (!(await verifyToken(loginPayload.password, user)))
       throw new Exception(STATUS_CODES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(user.at(0)?.id);
+    const refreshToken = generateRefreshToken(user.at(0)?.id);
 
-    await saveUserTokenInDatabase(req, user, refreshToken);
+    await updateUserToken(user, refreshToken);
 
     Return(res, STATUS_CODES.OK, { accessToken, refreshToken });
   } catch (err) {
@@ -95,15 +95,15 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
 
     if (!userId) throw new Exception(STATUS_CODES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED);
 
-    const user = await db.select().from(UserToken).where(eq(UserToken.userId, userId));
+    const userToken = await db.select({ id: UserToken.id, userId: UserToken.userId }).from(UserToken).where(eq(UserToken.userId, userId));
 
-    if (!user.at(0))
+    if (!userToken.at(0))
       throw new Exception(STATUS_CODES.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(userId);
+    const refreshToken = generateRefreshToken(userId);
 
-    saveUserTokenInDatabase(req, user, refreshToken);
+    updateUserToken(userId, refreshToken);
 
     Return(res, STATUS_CODES.OK, { accessToken, refreshToken });
   } catch (err) {
@@ -111,6 +111,9 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
   }
 }
 
+/**
+ * Checks if a User exists with the given username or email.
+ */
 export async function accountExists(req: Request, res: Response, next: NextFunction): Promise<any> {
   try {
     const user = await db.select()

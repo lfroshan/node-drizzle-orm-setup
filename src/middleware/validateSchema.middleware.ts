@@ -7,7 +7,7 @@ export const validateSchema = (schema: AnyZodObject) => (req: Request, res: Resp
     query: req.query,
     params: req.params,
   });
-  
+
   if (!schemaValidation.success) return res.status(400).json(schemaValidation.error);
 
   return next();

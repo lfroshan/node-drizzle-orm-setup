@@ -6,7 +6,6 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const User = pgTable('users', {
-  //id: varchar('id', { length: 36 }).default(sql`gen_random_uuid()`).primaryKey(),
   id: uuid('id').defaultRandom().primaryKey(),
   username: varchar('username', { length: 30 }).notNull().unique(),
   fullname: varchar('fullname', { length: 50 }).notNull(),
