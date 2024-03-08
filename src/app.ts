@@ -1,6 +1,8 @@
 import cors from 'cors';
+import http from 'http';
 import helmet from 'helmet';
 import express from 'express';
+import { Server } from 'socket.io';
 import session from 'express-session';
 
 import todoRouter from './route/todo/todo.route';
@@ -45,4 +47,12 @@ app.use('/api/v1/test', testRouter);
 // Catch and return any error here!
 app.use(requestErrorHandler);
 
-export default app;
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST"],
+  },
+});
+
+export { server, io, app };
