@@ -28,3 +28,7 @@ export const ERROR_MESSAGES = {
   PERMANENT_REDIRECT: 'Permanent Redirect',
   MOVED_PERMANENTLY: 'Moved Permanently'
 };
+
+export const CUSTOM_ERROR_MESSAGES = {
+  SORT_KEY_NOT_ALLOWED: 'Given Column is not allowed for sorting.'
+};

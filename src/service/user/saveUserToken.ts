@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { Request } from "express";
 
 import db from "../../db";
@@ -19,4 +20,15 @@ export async function saveUserTokenInDatabase(req: Request, user: Record<string,
   };
 
   await db.insert(UserToken).values(userToken);
+}
+
+/**
+ * Saves the UserToken to udpate the refresh token.
+ * 
+ * @param req - The Express Request object.
+ * @param user - The User record.
+ * @param refreshToken - Updates user toek
+ */
+export async function updateUserToken(user: Record<string, any>[], refreshToken: string): Promise<void> {
+  await db.update(UserToken).set({ token: refreshToken }).where(eq(UserToken.userId, user.at(0)?.id));
 }
