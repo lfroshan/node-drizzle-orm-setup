@@ -10,6 +10,7 @@ import testRouter from './route/test/test.route';
 import { ENV_CONFIGS } from './config/envConfigs';
 import studentRouter from './route/user/user.route';
 import { STATUS_CODES } from './constants/statusCodes';
+import profileRouter from './route/user-profile/userProfile.route';
 import { addModifiedDateToRequestData } from './middleware/addModifiedDate';
 import requestErrorHandler from './middleware/requestErrorHandler.middleware';
 
@@ -43,6 +44,7 @@ app.use("/health", async (req, res) => {
 app.use('/api/v1/users', studentRouter);
 app.use('/api/v1/todos', todoRouter);
 app.use('/api/v1/test', testRouter);
+app.use('/api/v1/user-profile', profileRouter);
 
 // Catch and return any error here!
 app.use(requestErrorHandler);

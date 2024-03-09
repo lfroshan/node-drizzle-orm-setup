@@ -14,6 +14,7 @@ import { UserLoginPayload } from "../../zod.domain/user/userLogin.domain";
 import { UserRegisterPayload } from "../../zod.domain/user/userRegister.domain";
 import { saveUserTokenInDatabase, updateUserToken } from "../../service/user/saveUserToken";
 import { generateAccessToken, generateRefreshToken, verifyToken } from "../../utils/security/tokenHelper";
+import { UserProfile } from "../../db/postgres/schema/userProfile.schema";
 
 /**
  * User Registration Controller.
@@ -31,12 +32,19 @@ export async function registerUser(req: Request, res: Response, next: NextFuncti
       throw new Exception(STATUS_CODES.BAD_REQUEST, VALIDATION_ERRORS.PASSWORD_NOT_MATCHED);
 
     const userData = await prepareUserData(userPayload);
-    const user = await db.insert(User).values(userData).returning({ id: User.id });
+    // updatedAt and createdAt remains the same during creation.
+    const user = await db.insert(User).values({ ...userData, createdAt: req.body.updatedAt }).returning({ id: User.id });
+    const userId: string = user.at(0)?.id ?? ''; // This is never be empty if created.
+
+    // creating an empty profile.
+    const profileCreate = db.insert(UserProfile).values({ userId: userId, createdAt: req.body.updatedAt });
 
     const accessToken = generateAccessToken(user.at(0)?.id);
     const refreshToken = generateRefreshToken(user.at(0)?.id);
 
-    await saveUserTokenInDatabase(req, user, refreshToken);
+    const userTokenCreate = saveUserTokenInDatabase(req, user, refreshToken);
+
+    await Promise.all([profileCreate, userTokenCreate]);
 
     Return(res, STATUS_CODES.CREATED, { accessToken, refreshToken });
   } catch (err) {

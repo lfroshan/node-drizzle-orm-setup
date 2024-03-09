@@ -12,7 +12,7 @@ todoRouter.post('/', validateAccessToken, validateSchema(TodoCreateSchema), crea
 
 todoRouter.get('/byId/:id', validateAccessToken, getATodo);
 
-todoRouter.post('/:id', validateAccessToken, updateATodo);
+todoRouter.patch('/:id', validateAccessToken, updateATodo);
 
 todoRouter.get('/offset', validateAccessToken, validateGetParamsForOffset, getTodosWithOffSet);
 
