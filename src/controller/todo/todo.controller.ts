@@ -77,9 +77,6 @@ export async function getTodosWithCursor(req: Request, res: Response, next: Next
   const { userId } = req.body.userId;
   const { limit, lastCursor } = getTodoReqParams(req);
 
-  console.log("cursor", lastCursor);
-  console.log(new Date(lastCursor));
-
   try {
     // cursor example.
     const todos = await db.select()
@@ -88,7 +85,7 @@ export async function getTodosWithCursor(req: Request, res: Response, next: Next
       .limit(limit)
       .where(and(eq(Todo.user, userId), gt(Todo.createdAt, new Date(lastCursor))));
 
-    Return(res, STATUS_CODES.OK, { data: todos })
+    Return(res, STATUS_CODES.OK, todos)
   } catch (err) {
     next(err);
   }

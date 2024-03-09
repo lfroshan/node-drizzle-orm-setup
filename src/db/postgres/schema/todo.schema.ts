@@ -13,8 +13,8 @@ const Todo = pgTable("todo", {
   title: varchar("title", { length: 100 }).notNull(),
   description: varchar("description", { length: 500 }),
   user: uuid("user_id").references(() => User.id).notNull(),
-  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow(),
-  updatedAt: varchar("updated_at", { length: 30 })
+  createdAt: timestamp("created_at", { mode: 'date', withTimezone: false }).default(new Date()),
+  updatedAt: timestamp("updated_at", { mode: 'date', withTimezone: false }).default(new Date())
 });
 
 export default Todo;

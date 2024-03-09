@@ -16,6 +16,7 @@ export async function saveUserTokenInDatabase(req: Request, user: Record<string,
     token: refreshToken,
     // updatedAt date is always included in POST request.
     updatedAt: req.body.updatedAt,
+    createdAt: req.body.updatedAt,
     userId: user.at(0)?.id
   };
 
